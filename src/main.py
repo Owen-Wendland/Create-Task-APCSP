@@ -1,3 +1,8 @@
+'''
+Owen Wendland
+APCSP 
+Create Task
+'''
 import math
 import pygame
 import pymunk
@@ -6,22 +11,28 @@ import time
 import os
 import sys
 import tkinter
-'''
+import platform
+#^^^^^ Importing needed imports ^^^^^
+
 cwd = os.getcwd()
 cwd = str(cwd)
-cwd = cwd.replace('src','')
-print(cwd + '\\dat')
-sys.path.append(cwd + '\\dat')
-import constants
-'''
+if platform.system == 'Windows':
+    cwd = cwd.replace('src','')
+else:
+    cwd = cwd.replace('src','')
+print(cwd + '/dat')
+sys.path.append(cwd + '/dat')
+#import constants
+#This cwd section takes the 'Current Working Directory'
+
 def main():
-    pygame.init()
+    pygame.init() #Initializes pygame
    
-    BACKGROUND = (150, 150, 150) 
+    BACKGROUND = (150, 150, 150) #Makes the background a color
    
-    world = pymunk.Space()
-    world.gravity = (0, 1000) 
-    world.damping = .4 
+    world = pymunk.Space() #Making the physics world
+    world.gravity = (0, 1000) #Making gravity pull on objects
+    world.damping = .3 #Applying air resistance to objects
     
     tk = tkinter.Tk()
     
@@ -47,14 +58,14 @@ def main():
             self.ball_body = pymunk.Body(1, pymunk.moment_for_circle(1, 0, self.ballRadius))
             self.ball_body.position = (startx, starty)
             self.ball_shape = pymunk.Circle(self.ball_body, self.ballRadius)
-            self.ball_shape.elasticity = 1.3
+            self.ball_shape.elasticity = 1.1
             self.ball_shape.friction = 3
             self.ball_shape.density = 1
             self.ball_shape.collision_type = 1
             self.notClicked = False
             world.add(self.ball_body, self.ball_shape)
-            self.image = pygame.image.load("res\\circle.png")
-            self.image = pygame.transform.scale(self.image, (self.ballRadius * 1.9,self.ballRadius * 1.9))
+            self.image = pygame.image.load(cwd + "res/circle.png")
+            self.image = pygame.transform.scale(self.image, (int(self.ballRadius * 1.9),int(self.ballRadius * 1.9)))
             self.imageRect = self.image.get_rect(center = self.ball_body.position)
             
         def draw(self):
@@ -69,7 +80,7 @@ def main():
     class Line():
         def __init__(self, firstpoint, secondpoint, ela, fric, collisionType):
             self.point1, self.point2 = firstpoint, secondpoint
-            self.width = screenSize[0]//screenSize[1]*6
+            self.width = int(screenSize[0]//screenSize[1]*6)
            
             self.lineBody = pymunk.Body(body_type=pymunk.Body.STATIC)
             self.lineShape = pymunk.Segment(self.lineBody, (self.point1), (self.point2), self.width) 
@@ -119,11 +130,11 @@ def main():
     balls = []
     for i in range(21):
         balls.extend([
-            ball(screenSize[0]//5*i//2,screenSize[1]//6,screenSize[0]//96),
-            ball(screenSize[0]//5*i//2 + (screenSize[0]//5)//4,screenSize[1]//6*2,screenSize[0]//96),
-            ball(screenSize[0]//5*i//2,screenSize[1]//6*3,screenSize[0]//96),
-            ball(screenSize[0]//5*i//2 + (screenSize[0]//5)//4,screenSize[1]//6*4,screenSize[0]//96),
-            ball(screenSize[0]//5*i//2,screenSize[1]//6*5,screenSize[0]//96)
+            ball(int(screenSize[0]//5*i//2),int(screenSize[1]//6),int(screenSize[0]//96)),
+            ball(int(screenSize[0]//5*i//2 + (screenSize[0]//5)//4),int(screenSize[1]//6*2),int(screenSize[0]//96)),
+            ball(int(screenSize[0]//5*i//2),int(screenSize[1]//6*3),int(screenSize[0]//96)),
+            ball(int(screenSize[0]//5*i//2 + (screenSize[0]//5)//4),int(screenSize[1]//6*4),int(screenSize[0]//96)),
+            ball(int(screenSize[0]//5*i//2),int(screenSize[1]//6*5),int(screenSize[0]//96))
         ])
     
     floor = Line((0,screenSize[1]),(screenSize[0],screenSize[1]), 0, 5, 3)
@@ -146,7 +157,7 @@ def main():
         
     plinkoBall.notClicked = True
     
-    blip = pygame.mixer.Sound("res\\plinko.wav")
+    blip = pygame.mixer.Sound(cwd + "res/plinko.wav")
 
     
     def sound(arbiter, world, data):
@@ -176,6 +187,8 @@ def main():
         if(plinkoBall.notClicked):
             pos = (pygame.mouse.get_pos()[0],screenSize[1]//20)
             plinkoBall.ball_body.position = pos
+            plinkoBall.ball_body.velocity = (0,0)
+            plinkoBall.ball_body.angle = 0
                       
         for event in events:
             if event.type == pygame.KEYDOWN: 
