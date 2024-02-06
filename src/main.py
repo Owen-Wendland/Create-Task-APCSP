@@ -16,97 +16,36 @@ import platform
 
 cwd = os.getcwd()
 cwd = str(cwd)
+
 if platform.system == 'Windows':
     cwd = cwd.replace('src','')
 else:
     cwd = cwd.replace('src','')
-print(cwd + '/dat')
-sys.path.append(cwd + '/dat')
-#import constants
+    
+sys.path.append(cwd + 'res')
+
+import constants
 #This cwd section takes the 'Current Working Directory'
 
 def main():
     pygame.init() #Initializes pygame
    
-    BACKGROUND = (150, 150, 150) #Makes the background a color
+    BACKGROUND = (constants.Background) #Makes the background a color
    
     world = pymunk.Space() #Making the physics world
     world.gravity = (0, 1000) #Making gravity pull on objects
     world.damping = .3 #Applying air resistance to objects
     
-    tk = tkinter.Tk()
+    screenSize = constants.screenSize #gets the size of your monitor
     
-    screenSize = (tk.winfo_screenwidth(), tk.winfo_screenheight())
+    global RUNNING
+    RUNNING = True #Makes running true, running is the variable used to check if game is running
     
-    print(screenSize)
-   
-    left = False
-    right = False
-    up = False
-    down = False
-    shift = False
-    global RUNNING 
-    RUNNING = True
     screen = pygame.display.set_mode(screenSize, pygame.FULLSCREEN)
     clock = pygame.time.Clock()
    
-    pygame.display.set_mode(screenSize, pygame.FULLSCREEN)
-   
-    class Plinko():
-        def __init__(self, startx, starty, radius):
-            self.ballRadius = radius
-            self.ball_body = pymunk.Body(1, pymunk.moment_for_circle(1, 0, self.ballRadius))
-            self.ball_body.position = (startx, starty)
-            self.ball_shape = pymunk.Circle(self.ball_body, self.ballRadius)
-            self.ball_shape.elasticity = 1.1
-            self.ball_shape.friction = 3
-            self.ball_shape.density = 1
-            self.ball_shape.collision_type = 1
-            self.notClicked = False
-            world.add(self.ball_body, self.ball_shape)
-            self.image = pygame.image.load(cwd + "res/circle.png")
-            self.image = pygame.transform.scale(self.image, (int(self.ballRadius * 1.9),int(self.ballRadius * 1.9)))
-            self.imageRect = self.image.get_rect(center = self.ball_body.position)
-            
-        def draw(self):
-            self.angle_degrees = math.degrees(self.ball_body.angle)
-            self.rotatedimage = pygame.transform.rotate(self.image, -self.angle_degrees)
-            self.imageRect = self.rotatedimage.get_rect(center = self.ball_body.position)
-            pygame.draw.circle(screen, (0,0,0), (int(self.ball_body.position.x), int(self.ball_body.position.y)), self.ballRadius + 2)
-            pygame.draw.circle(screen, (255,255,255), (int(self.ball_body.position.x), int(self.ball_body.position.y)), self.ballRadius) 
-            screen.blit(self.rotatedimage, self.imageRect)   
-            
-   
-    class Line():
-        def __init__(self, firstpoint, secondpoint, ela, fric, collisionType):
-            self.point1, self.point2 = firstpoint, secondpoint
-            self.width = int(screenSize[0]//screenSize[1]*6)
+    #pygame.display.set_mode(screenSize, pygame.FULLSCREEN)
            
-            self.lineBody = pymunk.Body(body_type=pymunk.Body.STATIC)
-            self.lineShape = pymunk.Segment(self.lineBody, (self.point1), (self.point2), self.width) 
-            self.lineShape.elasticity = ela 
-            self.lineShape.friction = fric 
-            self.lineShape.collision_type = collisionType
-            world.add(self.lineShape, self.lineBody)   
-        def draw(self):
-            pygame.draw.line(screen, (0,0,0), (self.point1), (self.point2), self.width)
-   
-    class ball():
-        def __init__(self, startx, starty, radius):
-            self.ballRadius = radius
-            self.ball_body = pymunk.Body(1, pymunk.moment_for_circle(1, 0, self.ballRadius))
-            self.ball_body.position = (startx, starty)
-            self.ball_body.body_type = pymunk.Body.STATIC
-            self.ball_shape = pymunk.Circle(self.ball_body, self.ballRadius)
-            self.ball_shape.elasticity = 1.2
-            self.ball_shape.friction = 3
-            self.ball_shape.density = 1
-            self.ball_shape.collision_type = 2
-            world.add(self.ball_body, self.ball_shape)
-        def draw(self):
-            pygame.draw.circle(screen, (255,255,255), (int(self.ball_body.position.x), int(self.ball_body.position.y)), self.ballRadius) 
-            
-            
     class text():
         def __init__(self, textFont, textWritten, x, y, size):
             self.x = x
@@ -125,22 +64,22 @@ def main():
         def draw(self):
             screen.blit(self.text, self.location)
    
-    plinkoBall = Plinko(200, 200, 30)
+    plinkoBall = constants.Plinko(200, 200, screenSize[0]//66,world, screen)
     
     balls = []
     for i in range(21):
         balls.extend([
-            ball(int(screenSize[0]//5*i//2),int(screenSize[1]//6),int(screenSize[0]//96)),
-            ball(int(screenSize[0]//5*i//2 + (screenSize[0]//5)//4),int(screenSize[1]//6*2),int(screenSize[0]//96)),
-            ball(int(screenSize[0]//5*i//2),int(screenSize[1]//6*3),int(screenSize[0]//96)),
-            ball(int(screenSize[0]//5*i//2 + (screenSize[0]//5)//4),int(screenSize[1]//6*4),int(screenSize[0]//96)),
-            ball(int(screenSize[0]//5*i//2),int(screenSize[1]//6*5),int(screenSize[0]//96))
+            constants.ball(int(screenSize[0]//5*i//2), int(screenSize[1]//6), int(screenSize[0]//96), world, screen),
+            constants.ball(int(screenSize[0]//5*i//2 + (screenSize[0]//5)//4), int(screenSize[1]//6*2), int(screenSize[0]//96), world, screen),
+            constants.ball(int(screenSize[0]//5*i//2), int(screenSize[1]//6*3), int(screenSize[0]//96), world, screen),
+            constants.ball(int(screenSize[0]//5*i//2 + (screenSize[0]//5)//4), int(screenSize[1]//6*4), int(screenSize[0]//96), world, screen),
+            constants.ball(int(screenSize[0]//5*i//2), int(screenSize[1]//6*5), int(screenSize[0]//96), world, screen)
         ])
     
-    floor = Line((0,screenSize[1]),(screenSize[0],screenSize[1]), 0, 5, 3)
-    wallLeft = Line((0,-150),(0,screenSize[1]), 0, 0, 4)
-    wallRight = Line((screenSize[0],-150),(screenSize[0],screenSize[1]), 0, 0, 4)
-    roof = Line((0,0),(screenSize[0],0), 1, 0, 4)
+    floor = constants.Line((0,screenSize[1]),(screenSize[0],screenSize[1]), 0, 5, 3, world, screen)
+    wallLeft = constants.Line((0,-150),(0,screenSize[1]), 0, 0, 4, world, screen)
+    wallRight = constants.Line((screenSize[0],-150),(screenSize[0],screenSize[1]), 0, 0, 4, world, screen)
+    roof = constants.Line((0,0),(screenSize[0],0), 1, 0, 4, world, screen)
    
     linelist = []
     linelist.extend([
@@ -152,7 +91,7 @@ def main():
     
     for i in range(10):
         linelist.extend([
-            Line((screenSize[0]//10*i,screenSize[1]),(screenSize[0]//10*i,screenSize[1]//12*10), 1, 5, 4)
+            constants.Line((screenSize[0]//10*i,screenSize[1]),(screenSize[0]//10*i,screenSize[1]//12*10), 1, 5, 4, world, screen)
         ])
         
     plinkoBall.notClicked = True
@@ -164,6 +103,7 @@ def main():
         pygame.mixer.Sound.play(blip)
     def reset(arbiter, world, data):
         plinkoBall.notClicked = True
+        return(True)
         
     plink = world.add_collision_handler(1, 2)
     floorPlink = world.add_collision_handler(1, 3)
