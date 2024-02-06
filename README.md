@@ -8,7 +8,3 @@ My submission for the APCSP test that is a plinko game using [pygame](https://ww
 - [@Owen Wendland](https://www.github.com/Owen-Wendland)
 
 
-## License
-
-[MIT](https://choosealicense.com/licenses/mit/)
-
