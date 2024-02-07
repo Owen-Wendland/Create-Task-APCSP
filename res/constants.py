@@ -14,7 +14,7 @@ cwd = os.getcwd()
 cwd = str(cwd)
 
 if platform.system == 'Windows':
-    cwd = cwd.replace('src','')
+    cwd = cwd.replace('src','/')
 else:
     cwd = cwd.replace('src','')
 
@@ -32,7 +32,7 @@ class Plinko():
             self.world = world
             self.screen = screen
             self.world.add(self.ball_body, self.ball_shape)
-            self.image = pygame.image.load(cwd + "res/circle.png")
+            self.image = pygame.image.load(cwd + "/res/circle2.png")
             self.image = pygame.transform.scale(self.image, (int(self.ballRadius * 1.9),int(self.ballRadius * 1.9)))
             self.imageRect = self.image.get_rect(center = self.ball_body.position)
             
@@ -40,8 +40,8 @@ class Plinko():
             self.angle_degrees = math.degrees(self.ball_body.angle)
             self.rotatedimage = pygame.transform.rotate(self.image, -self.angle_degrees)
             self.imageRect = self.rotatedimage.get_rect(center = self.ball_body.position)
-            pygame.draw.circle(self.screen, (0,0,0), (int(self.ball_body.position.x), int(self.ball_body.position.y)), self.ballRadius + 2)
-            pygame.draw.circle(self.screen, (255,255,255), (int(self.ball_body.position.x), int(self.ball_body.position.y)), self.ballRadius) 
+            #pygame.draw.circle(self.screen, (0,0,0), (int(self.ball_body.position.x), int(self.ball_body.position.y)), self.ballRadius + 2)
+            #pygame.draw.circle(self.screen, (255,255,255), (int(self.ball_body.position.x), int(self.ball_body.position.y)), self.ballRadius) 
             self.screen.blit(self.rotatedimage, self.imageRect)  
 class Line():
         def __init__(self, firstpoint, secondpoint, ela, fric, collisionType, world, screen):
@@ -72,6 +72,8 @@ class ball():
             self.screen = screen
             self.world = world
             self.world.add(self.ball_body, self.ball_shape)
+            self.image = pygame.image.load(cwd + "/res/ball.png")
+            self.image = pygame.transform.scale(self.image, (int(self.ballRadius * 3),int(self.ballRadius * 3)))
+            self.imageRect = self.image.get_rect(center = self.ball_body.position)
         def draw(self):
-            pygame.draw.circle(self.screen, (255,255,255), (int(self.ball_body.position.x), int(self.ball_body.position.y)), self.ballRadius) 
-
+            self.screen.blit(self.image, self.imageRect)  

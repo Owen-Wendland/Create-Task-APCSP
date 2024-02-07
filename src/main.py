@@ -3,14 +3,11 @@ Owen Wendland
 APCSP 
 Create Task
 '''
-import math
 import pygame
 import pymunk
 import random
-import time
 import os
 import sys
-import tkinter
 import platform
 #^^^^^ Importing needed imports ^^^^^
 
@@ -19,10 +16,13 @@ cwd = str(cwd)
 
 if platform.system == 'Windows':
     cwd = cwd.replace('src','')
-else:
-    cwd = cwd.replace('src','')
     
-sys.path.append(cwd + 'res')
+else:
+    cwd = cwd.replace('/src','')
+    
+print(cwd + 'res')
+
+sys.path.append(cwd + '/res')
 
 import constants
 #This cwd section takes the 'Current Working Directory' and adds the constants file to it
@@ -68,7 +68,7 @@ def main():
         def draw(self):#draws the text
             screen.blit(self.text, self.location)
             #Blits / Displays the text on the location
-   
+
     plinkoBall = constants.Plinko(200, 200, screenSize[0]//66,world, screen)
     #Makes the plinko circle
     
@@ -107,7 +107,7 @@ def main():
     plinkoBall.notClicked = True
     #sets the plinkoBall to notClicked
     
-    blip = pygame.mixer.Sound(cwd + "res/plinko.wav")
+    blip = pygame.mixer.Sound(cwd + "/res/plinko.wav")
     #defines the blip sound used for when the ball bounces
 
     def sound(arbiter, world, data):
@@ -124,43 +124,56 @@ def main():
     plink.separate = sound
     #Runs sound when bouncing
     floorPlink.begin = reset
-    #Runs reset when hits floor
-        
+    #Runs reset when hits floor 
     while RUNNING:
         screen.fill(BACKGROUND)
         #Fills the background of the screen
         
         for i in range(len(linelist)):
             linelist[i].draw()
-        
+        #drawing the location of all the lines and walls
         for i in range(len(balls)):
             balls[i].draw()
-            
+        #drawing the location of the balls
         plinkoBall.draw()
-        
+        #drawing the plinko ball
         events = pygame.event.get()
+        #getting all input events
            
-           
-        if(plinkoBall.notClicked):
-            pos = (pygame.mouse.get_pos()[0],screenSize[1]//20)
-            plinkoBall.ball_body.position = pos
-            plinkoBall.ball_body.velocity = (0,0)
-            plinkoBall.ball_body.angle = 0
-                      
+        if(plinkoBall.notClicked):#Runs when clicked
+            pos = (pygame.mouse.get_pos()[0],screenSize[1]//20)#setting the ball to the x position of the mouse/top of the screen
+            plinkoBall.ball_body.position = pos #setting the position to the plinkoBall
+            plinkoBall.ball_body.velocity = (0,0) #resetting velocity
+            plinkoBall.ball_body.angle = 0 #reseting angle
+            plinkoBall.ball_body.angular_velocity = 0
+            click = True
+            
+        else:
+            if(click):
+                click = False
+                randNum = random.uniform(-4,4) #Gets random float from -1 to 1
+                if randNum == 0.0: #If its zero set it to 1
+                    randNum = 5
+                plinkoBall.ball_body.angular_velocity = randNum #Sets the angular velocity to random to more randomize chance
+                
         for event in events:
             if event.type == pygame.KEYDOWN: 
                 if event.key == pygame.K_ESCAPE: 
                     RUNNING = False
+                    #If the user presses esc key leave game
+                    
             if event.type == pygame.MOUSEBUTTONDOWN:
                 plinkoBall.notClicked = False
-                    
-                    
-        pygame.display.update()
-       
+                #if the user clicks than drop the ball
+        
+        pygame.display.update()#Updating the display  
         world.step(1/60.0)
         clock.tick(60)
-
+        #Stepping the physics engine and fps by 60
+        
 if __name__ == "__main__":
     main()
+    #Runs if focused
 
 pygame.quit()
+#quits when loop is done
