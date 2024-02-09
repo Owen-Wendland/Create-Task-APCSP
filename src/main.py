@@ -9,6 +9,7 @@ import random
 import os
 import sys
 import platform
+import time
 #^^^^^ Importing needed imports ^^^^^
 
 cwd = os.getcwd()
@@ -29,6 +30,7 @@ class Variables():
     def __init__(self):
         self.score = 0
         self.tries = 1
+        self.maxTries = 3
         
 var = Variables()
 
@@ -46,11 +48,11 @@ def main():
     global RUNNING
     RUNNING = True #Makes running true, running is the variable used to check if game is running
     
-    screen = pygame.display.set_mode(screenSize, pygame.FULLSCREEN) #Making the screen
-    #screen = pygame.display.set_mode(screenSize)
+    #screen = pygame.display.set_mode(screenSize, pygame.FULLSCREEN) #Making the screen
+    screen = pygame.display.set_mode(screenSize)
     clock = pygame.time.Clock() #Defining the FPS module of the game 
 
-    plinkoBall = constants.Plinko(200, 200, screenSize[0]//66,world, screen)
+    plinkoBall = constants.Plinko(200, 200, screenSize[0]//64,world, screen)
     #Makes the plinko circle
     
     balls = []
@@ -84,8 +86,11 @@ def main():
             constants.Line((screenSize[0]//10*i,screenSize[1]),(screenSize[0]//10*i,screenSize[1]//12*10), 1, 5, 4, world, screen)
         ])
     #Adds the sections at the bottom used for containing the ball
+
+    textToWrite = 'Score: ' + str(var.score)
+    textToWrite = textToWrite + ' | Tries left ' + str((var.maxTries - var.tries) + 1)
         
-    textList = [constants.text('freesansbold.ttf', ('score: 0'), screenSize[0]/2, screenSize[1]/10, 64, screen)]
+    textList = [constants.text('freesansbold.ttf', textToWrite, screenSize[0]/2, screenSize[1]/10, 64, screen)]
         
     for i in range(10):
         if(i < 5):
@@ -106,11 +111,24 @@ def main():
         ])
         
     plinkoBall.notClicked = True
-    #sets the plinkoBall to notClicked
+    #Sets the plinkoBall to notClicked
     
     blip = pygame.mixer.Sound(cwd + "/res/plinko.wav")
-    #defines the blip sound used for when the ball bounces
-
+    hit = pygame.mixer.Sound(cwd + "/res/hit.wav")
+    #Defines the blip sound used for when the ball bounces
+    #Defines hit sound used for when the ball hits the ground
+    #This blip & hit sound was made my me using sound software
+    pygame.mixer.init(frequency=22050)
+    pygame.mixer.music.load(cwd + "/res/song.wav")
+    pygame.mixer.music.play(100)
+    
+    music = []
+    for i in range(4):
+        i = str(i)
+        music.extend([
+            pygame.mixer.Sound(cwd + "/res/synth" + i + ".wav")
+        ])
+    
     def sound(arbiter, world, data):
         pygame.mixer.Sound.play(blip) 
     #The sound function used to play a sound when bounced
@@ -128,14 +146,33 @@ def main():
                 
                 var.score += a
                 
-        text = ('score: ' + str(var.score))
-        text = str(text)
-        textList[0].reWrite(text)
+        textToWrite = 'Score: ' + str(var.score)
+        textToWrite = textToWrite + ' | Tries left ' + str((var.maxTries - var.tries))
+        textList[0].reWrite(textToWrite)
+
+        if(var.tries < var.maxTries):
+            pygame.mixer.Sound.play(hit)
+        else:
+            pygame.mixer.music.stop()
+            for i in range(len(music)-1,0,-1):
+                pygame.mixer.Sound.play(music[i])
+                time.sleep(.2)
+            textToWrite = 'You Got ' + str(var.score) + ' Points!... Press R to reset!'
+            textList[0].reWrite(textToWrite)
         
         plinkoBall.notClicked = True
         var.tries += 1
         return(True)
-    #The reset function
+    
+    def trueReset():
+        pygame.mixer.music.play()
+        var.tries = 1
+        var.score = 0
+        textToWrite = 'Score: ' + str(var.score)
+        textToWrite = textToWrite + ' | Tries left ' + str((var.maxTries - var.tries)+1)
+        textList[0].reWrite(textToWrite)
+        
+    #The reset functions
         
     plink = world.add_collision_handler(1, 2)
     floorPlink = world.add_collision_handler(1, 3)
@@ -144,10 +181,11 @@ def main():
     #Runs sound when bouncing
     floorPlink.begin = reset
     #Runs reset when hits floor
-    maxTries = 10
+    var.maxTries = 3
     #defines max tries
     lastPos = screenSize[0]//2
     #defining start pos
+    
     while RUNNING:
         screen.fill(BACKGROUND)
         #Fills the background of the screen
@@ -191,9 +229,12 @@ def main():
                 if event.key == pygame.K_ESCAPE: 
                     RUNNING = False
                     #If the user presses esc key leave game
+                if event.key == pygame.K_r:
+                    if(var.tries > var.maxTries):
+                        trueReset()
                     
             if event.type == pygame.MOUSEBUTTONDOWN:
-                if(var.tries <= maxTries):
+                if(var.tries <= var.maxTries):
                     plinkoBall.notClicked = False
                     #if the user clicks than drop the ball
         
