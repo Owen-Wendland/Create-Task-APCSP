@@ -20,12 +20,17 @@ if platform.system == 'Windows':
 else:
     cwd = cwd.replace('/src','')
     
-print(cwd + 'res')
-
 sys.path.append(cwd + '/res')
 
 import constants
 #This cwd section takes the 'Current Working Directory' and adds the constants file to it
+
+class Variables():
+    def __init__(self):
+        self.score = 0
+        self.tries = 1
+        
+var = Variables()
 
 def main():
     pygame.init() #Initializes pygame
@@ -42,32 +47,8 @@ def main():
     RUNNING = True #Makes running true, running is the variable used to check if game is running
     
     screen = pygame.display.set_mode(screenSize, pygame.FULLSCREEN) #Making the screen
+    #screen = pygame.display.set_mode(screenSize)
     clock = pygame.time.Clock() #Defining the FPS module of the game 
-
-    class text():#Making the text class to write strings on screen      
-        def __init__(self, textFont, textWritten, x, y, size):
-            self.x = x
-            self.y = y
-            #Gets x and y of where you want the text
-            self.font = pygame.font.Font(textFont, size)
-            #The font of the text
-            self.textWritten = textWritten
-            #What text you'll display
-            self.text = self.font.render(self.textWritten, True, (0,0,0))
-            #Gets the render of the text image
-            self.location = self.text.get_rect(center = (self.x, self.y))
-            #Sets the location of the text
-           
-        def reWrite(self, textWritten):#changes text
-            self.textWritten = textWritten
-            #Changes the text to write
-            self.text = self.font.render(self.textWritten, True, (0,0,0),)
-            self.location = self.text.get_rect(center = (self.x, self.y))
-            #Gets the location and render of it
-           
-        def draw(self):#draws the text
-            screen.blit(self.text, self.location)
-            #Blits / Displays the text on the location
 
     plinkoBall = constants.Plinko(200, 200, screenSize[0]//66,world, screen)
     #Makes the plinko circle
@@ -104,6 +85,26 @@ def main():
         ])
     #Adds the sections at the bottom used for containing the ball
         
+    textList = [constants.text('freesansbold.ttf', ('score: 0'), screenSize[0]/2, screenSize[1]/10, 64, screen)]
+        
+    for i in range(10):
+        if(i < 5):
+            a = i * 0.5
+        elif(i == 5):
+            a = (i * 0.5) - 0.5
+        else:
+            a = 2 - ((i - 5) * 0.5)
+            
+        textList.extend([
+            constants.text('freesansbold.ttf', str(round(a,1)), (screenSize[0]//20 * 2 * i) + screenSize[0]//20, screenSize[1]//9 * 8, 32, screen)
+        ])
+        
+    zones = []
+    for i in range(11):
+        zones.extend([
+            (screenSize[0]//10 * i)
+        ])
+        
     plinkoBall.notClicked = True
     #sets the plinkoBall to notClicked
     
@@ -114,7 +115,25 @@ def main():
         pygame.mixer.Sound.play(blip) 
     #The sound function used to play a sound when bounced
     def reset(arbiter, world, data):
+        
+        for i in range(10):
+            x = plinkoBall.ball_body.position.x
+            if(x > zones[i] and zones[i + 1] > x):
+                if(i < 5):
+                    a = i * 0.5
+                elif(i == 5):
+                    a = (i * 0.5) - 0.5
+                else:
+                    a = 2 - ((i - 5) * 0.5)
+                
+                var.score += a
+                
+        text = ('score: ' + str(var.score))
+        text = str(text)
+        textList[0].reWrite(text)
+        
         plinkoBall.notClicked = True
+        var.tries += 1
         return(True)
     #The reset function
         
@@ -124,16 +143,25 @@ def main():
     plink.separate = sound
     #Runs sound when bouncing
     floorPlink.begin = reset
-    #Runs reset when hits floor 
+    #Runs reset when hits floor
+    maxTries = 10
+    #defines max tries
+    lastPos = screenSize[0]//2
+    #defining start pos
     while RUNNING:
         screen.fill(BACKGROUND)
         #Fills the background of the screen
         
         for i in range(len(linelist)):
             linelist[i].draw()
+            
         #drawing the location of all the lines and walls
         for i in range(len(balls)):
             balls[i].draw()
+            
+        for i in range(len(textList)):
+            textList[i].draw()
+        
         #drawing the location of the balls
         plinkoBall.draw()
         #drawing the plinko ball
@@ -141,7 +169,9 @@ def main():
         #getting all input events
            
         if(plinkoBall.notClicked):#Runs when clicked
-            pos = (pygame.mouse.get_pos()[0],screenSize[1]//20)#setting the ball to the x position of the mouse/top of the screen
+            if(pygame.mouse.get_pos()[0] > screenSize[0]//64 and pygame.mouse.get_pos()[0] < screenSize[0]//64 * 63):
+                lastPos = (pygame.mouse.get_pos()[0],screenSize[1]//20)#setting the ball to the x position of the mouse/top of the screen
+            pos = lastPos
             plinkoBall.ball_body.position = pos #setting the position to the plinkoBall
             plinkoBall.ball_body.velocity = (0,0) #resetting velocity
             plinkoBall.ball_body.angle = 0 #reseting angle
@@ -163,8 +193,9 @@ def main():
                     #If the user presses esc key leave game
                     
             if event.type == pygame.MOUSEBUTTONDOWN:
-                plinkoBall.notClicked = False
-                #if the user clicks than drop the ball
+                if(var.tries <= maxTries):
+                    plinkoBall.notClicked = False
+                    #if the user clicks than drop the ball
         
         pygame.display.update()#Updating the display  
         world.step(1/60.0)
