@@ -32,7 +32,7 @@ class Plinko():
             self.world = world
             self.screen = screen
             self.world.add(self.ball_body, self.ball_shape)
-            self.image = pygame.image.load(cwd + "/res/circle2.png")
+            self.image = pygame.image.load(cwd + "/res/circle3.png")
             self.image = pygame.transform.scale(self.image, (int(self.ballRadius * 1.9),int(self.ballRadius * 1.9)))
             self.imageRect = self.image.get_rect(center = self.ball_body.position)
             
@@ -77,3 +77,28 @@ class ball():
             self.imageRect = self.image.get_rect(center = self.ball_body.position)
         def draw(self):
             self.screen.blit(self.image, self.imageRect)  
+class text():#Making the text class to write strings on screen      
+        def __init__(self, textFont, textWritten, x, y, size, screen):
+            self.x = x
+            self.y = y
+            self.screen = screen
+            #Gets x and y of where you want the text
+            self.font = pygame.font.Font(textFont, size)
+            #The font of the text
+            self.textWritten = textWritten
+            #What text you'll display
+            self.text = self.font.render(self.textWritten, True, (0,0,0))
+            #Gets the render of the text image
+            self.location = self.text.get_rect(center = (self.x, self.y))
+            #Sets the location of the text
+           
+        def reWrite(self, textWritten):#changes text
+            self.textWritten = textWritten
+            #Changes the text to write
+            self.text = self.font.render(self.textWritten, True, (0,0,0),)
+            self.location = self.text.get_rect(center = (self.x, self.y))
+            #Gets the location and render of it
+           
+        def draw(self):#draws the text
+            self.screen.blit(self.text, self.location)
+            #Blits / Displays the text on the location
