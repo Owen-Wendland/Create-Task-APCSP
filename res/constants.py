@@ -32,7 +32,7 @@ class Plinko():
             self.world = world
             self.screen = screen
             self.world.add(self.ball_body, self.ball_shape)
-            self.image = pygame.image.load(cwd + "/res/circle3.png")
+            self.image = pygame.image.load(cwd + "/res/circle4.png")
             self.image = pygame.transform.scale(self.image, (int(self.ballRadius * 1.9),int(self.ballRadius * 1.9)))
             self.imageRect = self.image.get_rect(center = self.ball_body.position)
             

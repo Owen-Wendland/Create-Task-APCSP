@@ -28,7 +28,7 @@ import constants
 
 class Variables():
     def __init__(self):
-        self.score = 0
+        self.score = 0.0
         self.tries = 1
         self.maxTries = 3
         
@@ -167,7 +167,7 @@ def main():
     def trueReset():
         pygame.mixer.music.play()
         var.tries = 1
-        var.score = 0
+        var.score = 0.0
         textToWrite = 'Score: ' + str(var.score)
         textToWrite = textToWrite + ' | Tries left ' + str((var.maxTries - var.tries)+1)
         textList[0].reWrite(textToWrite)
@@ -187,6 +187,8 @@ def main():
     #defining start pos
     
     while RUNNING:
+        plinkoBall.ball_shape.elasticity = random.uniform(1.0,1.4)
+        #randomizing bounce for more randomness in points
         screen.fill(BACKGROUND)
         #Fills the background of the screen
         
