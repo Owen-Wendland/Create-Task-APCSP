@@ -20,38 +20,36 @@ else:
 
 class Plinko():
         def __init__(self, startx, starty, radius, world, screen):
-            self.ballRadius = radius
-            self.ball_body = pymunk.Body(1, pymunk.moment_for_circle(1, 0, self.ballRadius))
-            self.ball_body.position = (startx, starty)
-            self.ball_shape = pymunk.Circle(self.ball_body, self.ballRadius)
-            self.ball_shape.elasticity = 1.1
-            self.ball_shape.friction = 3
-            self.ball_shape.density = 1
-            self.ball_shape.collision_type = 1
-            self.notClicked = False
-            self.world = world
-            self.screen = screen
-            self.world.add(self.ball_body, self.ball_shape)
-            self.image = pygame.image.load(cwd + "/res/circle4.png")
-            self.image = pygame.transform.scale(self.image, (int(self.ballRadius * 1.9),int(self.ballRadius * 1.9)))
-            self.imageRect = self.image.get_rect(center = self.ball_body.position)
+            self.ballRadius = radius # gets radius of ball
+            self.ball_body = pymunk.Body(1, pymunk.moment_for_circle(1, 0, self.ballRadius)) # makes the object a circle type physics
+            self.ball_body.position = (startx, starty) # sets its starting position
+            self.ball_shape = pymunk.Circle(self.ball_body, self.ballRadius) # gets the shape of the ball
+            self.ball_shape.elasticity = 1.1 # sets its elasticity/bounciness
+            self.ball_shape.friction = 3 # sets its friction
+            self.ball_shape.density = 1 # sets how dense the object is
+            self.ball_shape.collision_type = 1 # defines what collision number it is
+            self.notClicked = False # makes a variable for when its clicked to drop
+            self.world = world # gets the physics world
+            self.screen = screen # gets the game screen
+            self.world.add(self.ball_body, self.ball_shape) # adds the circle to a physics world
+            self.image = pygame.image.load(cwd + "/res/circle4.png") # loads the image of the circle
+            self.image = pygame.transform.scale(self.image, (int(self.ballRadius * 1.9),int(self.ballRadius * 1.9))) # scales the image to fit the circle
+            self.imageRect = self.image.get_rect(center = self.ball_body.position) # gets the rect/dimensions of the object to place the image at
             
         def draw(self):
-            self.angle_degrees = math.degrees(self.ball_body.angle)
-            self.rotatedimage = pygame.transform.rotate(self.image, -self.angle_degrees)
-            self.imageRect = self.rotatedimage.get_rect(center = self.ball_body.position)
-            #pygame.draw.circle(self.screen, (0,0,0), (int(self.ball_body.position.x), int(self.ball_body.position.y)), self.ballRadius + 2)
-            #pygame.draw.circle(self.screen, (255,255,255), (int(self.ball_body.position.x), int(self.ball_body.position.y)), self.ballRadius) 
-            self.screen.blit(self.rotatedimage, self.imageRect)  
+            self.angle_degrees = math.degrees(self.ball_body.angle) # gets the angle of the physics circle
+            self.rotatedimage = pygame.transform.rotate(self.image, -self.angle_degrees) # makes a new image rotated and placed where the circle is
+            self.imageRect = self.rotatedimage.get_rect(center = self.ball_body.position) # gets the rect/dimensions of the rotated image
+            self.screen.blit(self.rotatedimage, self.imageRect) # draws the image to the location of the circle
 class Line():
         def __init__(self, firstpoint, secondpoint, ela, fric, collisionType, world, screen):
-            self.point1, self.point2 = firstpoint, secondpoint
-            self.width = int(screenSize[0]//screenSize[1]*6)
+            self.point1, self.point2 = firstpoint, secondpoint # gets the two points the lines will go to
+            self.width = int(screenSize[0]//screenSize[1]*6) # gets the width of the line
            
-            self.lineBody = pymunk.Body(body_type=pymunk.Body.STATIC)
-            self.lineShape = pymunk.Segment(self.lineBody, (self.point1), (self.point2), self.width) 
-            self.lineShape.elasticity = ela 
-            self.lineShape.friction = fric 
+            self.lineBody = pymunk.Body(body_type=pymunk.Body.STATIC) # makes the lines static in place
+            self.lineShape = pymunk.Segment(self.lineBody, (self.point1), (self.point2), self.width) # gets the shape of the line
+            self.lineShape.elasticity = ela # sets its elasticity/bounciness 
+            self.lineShape.friction = fric # sets its friction
             self.lineShape.collision_type = collisionType
             self.world = world
             self.world.add(self.lineShape, self.lineBody)
@@ -65,10 +63,10 @@ class ball():
             self.ball_body.position = (startx, starty)
             self.ball_body.body_type = pymunk.Body.STATIC
             self.ball_shape = pymunk.Circle(self.ball_body, self.ballRadius)
-            self.ball_shape.elasticity = 1.2
-            self.ball_shape.friction = 3
-            self.ball_shape.density = 1
-            self.ball_shape.collision_type = 2
+            self.ball_shape.elasticity = 1.2 # sets its elasticity/bounciness
+            self.ball_shape.friction = 3 # sets its friction
+            self.ball_shape.density = 1 # sets how dense the object is
+            self.ball_shape.collision_type = 2 # sets the collision number it responds too
             self.screen = screen
             self.world = world
             self.world.add(self.ball_body, self.ball_shape)
@@ -92,13 +90,10 @@ class text():#Making the text class to write strings on screen
             self.location = self.text.get_rect(center = (self.x, self.y))
             #Sets the location of the text
            
-        def reWrite(self, textWritten):#changes text
-            self.textWritten = textWritten
-            #Changes the text to write
-            self.text = self.font.render(self.textWritten, True, (0,0,0),)
-            self.location = self.text.get_rect(center = (self.x, self.y))
-            #Gets the location and render of it
+        def reWrite(self, textWritten): # changes text
+            self.textWritten = textWritten # changes the text to write
+            self.text = self.font.render(self.textWritten, True, (0,0,0),) # 
+            self.location = self.text.get_rect(center = (self.x, self.y)) # gets the location and render of it
            
         def draw(self):#draws the text
-            self.screen.blit(self.text, self.location)
-            #Blits / Displays the text on the location
+            self.screen.blit(self.text, self.location) # blits / displays the text on the location
