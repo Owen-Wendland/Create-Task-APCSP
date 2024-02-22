@@ -50,50 +50,45 @@ class Line():
             self.lineShape = pymunk.Segment(self.lineBody, (self.point1), (self.point2), self.width) # gets the shape of the line
             self.lineShape.elasticity = ela # sets its elasticity/bounciness 
             self.lineShape.friction = fric # sets its friction
-            self.lineShape.collision_type = collisionType
-            self.world = world
-            self.world.add(self.lineShape, self.lineBody)
-            self.screen = screen
+            self.lineShape.collision_type = collisionType # defines what collision number it is
+            self.world = world # gets the physics world
+            self.world.add(self.lineShape, self.lineBody) # adds the line to a physics world
+            self.screen = screen # gets the game screen
         def draw(self):
-            pygame.draw.line(self.screen, (0,0,0), (self.point1), (self.point2), self.width)
+            pygame.draw.line(self.screen, (0,0,0), (self.point1), (self.point2), self.width) # draws the line
 class ball():
         def __init__(self, startx, starty, radius, world, screen):
-            self.ballRadius = radius
-            self.ball_body = pymunk.Body(1, pymunk.moment_for_circle(1, 0, self.ballRadius))
-            self.ball_body.position = (startx, starty)
-            self.ball_body.body_type = pymunk.Body.STATIC
-            self.ball_shape = pymunk.Circle(self.ball_body, self.ballRadius)
+            self.ballRadius = radius # gets the ball radius 
+            self.ball_body = pymunk.Body(1, pymunk.moment_for_circle(1, 0, self.ballRadius)) # makes the object a circle type physics
+            self.ball_body.position = (startx, starty) # sets its starting position
+            self.ball_body.body_type = pymunk.Body.STATIC # makes the balls static
+            self.ball_shape = pymunk.Circle(self.ball_body, self.ballRadius) # gets the shape of the ball
             self.ball_shape.elasticity = 1.2 # sets its elasticity/bounciness
             self.ball_shape.friction = 3 # sets its friction
             self.ball_shape.density = 1 # sets how dense the object is
             self.ball_shape.collision_type = 2 # sets the collision number it responds too
-            self.screen = screen
-            self.world = world
-            self.world.add(self.ball_body, self.ball_shape)
-            self.image = pygame.image.load(cwd + "/res/ball.png")
-            self.image = pygame.transform.scale(self.image, (int(self.ballRadius * 3),int(self.ballRadius * 3)))
-            self.imageRect = self.image.get_rect(center = self.ball_body.position)
+            self.screen = screen # gets the game screen
+            self.world = world # gets the physics world
+            self.world.add(self.ball_body, self.ball_shape) # adds the ball to a physics world
+            self.image = pygame.image.load(cwd + "/res/ball.png") # loads the image  of the ball
+            self.image = pygame.transform.scale(self.image, (int(self.ballRadius * 3),int(self.ballRadius * 3))) # scales the image to fit the ball
+            self.imageRect = self.image.get_rect(center = self.ball_body.position) # gets the rect/dimensions of the object to place the image at
         def draw(self):
             self.screen.blit(self.image, self.imageRect)  
 class text():#Making the text class to write strings on screen      
         def __init__(self, textFont, textWritten, x, y, size, screen):
-            self.x = x
-            self.y = y
-            self.screen = screen
-            #Gets x and y of where you want the text
-            self.font = pygame.font.Font(textFont, size)
-            #The font of the text
-            self.textWritten = textWritten
-            #What text you'll display
-            self.text = self.font.render(self.textWritten, True, (0,0,0))
-            #Gets the render of the text image
-            self.location = self.text.get_rect(center = (self.x, self.y))
-            #Sets the location of the text
+            self.x = x # gets x
+            self.y = y # gets y
+            self.screen = screen #Gets x and y of where you want the text
+            self.font = pygame.font.Font(textFont, size) #The font of the text
+            self.textWritten = textWritten #What text you'll display
+            self.text = self.font.render(self.textWritten, True, (0,0,0)) #Gets the render of the text image
+            self.location = self.text.get_rect(center = (self.x, self.y)) #Sets the location of the text
            
         def reWrite(self, textWritten): # changes text
             self.textWritten = textWritten # changes the text to write
             self.text = self.font.render(self.textWritten, True, (0,0,0),) # 
             self.location = self.text.get_rect(center = (self.x, self.y)) # gets the location and render of it
            
-        def draw(self):#draws the text
+        def draw(self): # draws the text
             self.screen.blit(self.text, self.location) # blits / displays the text on the location
